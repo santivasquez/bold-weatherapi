@@ -61,5 +61,3 @@ private fun LocationRowPreview() {
         )
     }
 }
-
-

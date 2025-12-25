@@ -1,12 +1,12 @@
 package com.example.bold_weather_api.ui.search
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun SearchRoute() {
-    val viewModel: SearchViewModel = viewModel(factory = SearchViewModel.Factory)
+    val viewModel: SearchViewModel = hiltViewModel()
     val state = viewModel.uiState.collectAsStateWithLifecycle()
 
     SearchScreen(
@@ -15,5 +15,3 @@ fun SearchRoute() {
         onRetry = viewModel::retry,
     )
 }
-
-

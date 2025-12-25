@@ -19,5 +19,3 @@ sealed interface SearchUiState {
         val message: String,
     ) : SearchUiState
 }
-
-

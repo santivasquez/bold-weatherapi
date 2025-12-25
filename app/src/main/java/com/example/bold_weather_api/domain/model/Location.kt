@@ -7,5 +7,3 @@ data class Location(
     val lat: Double? = null,
     val lon: Double? = null,
 )
-
-

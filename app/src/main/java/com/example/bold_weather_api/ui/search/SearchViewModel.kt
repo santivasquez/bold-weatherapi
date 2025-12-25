@@ -1,18 +1,19 @@
 package com.example.bold_weather_api.ui.search
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.bold_weather_api.data.repository.MockWeatherRepository
 import com.example.bold_weather_api.domain.model.Location
 import com.example.bold_weather_api.domain.usecase.GetAllLocationsUseCase
 import com.example.bold_weather_api.ui.search.components.LocationRowUi
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val getAllLocations: GetAllLocationsUseCase,
 ) : ViewModel() {
 
@@ -62,18 +63,4 @@ class SearchViewModel(
             name = name,
             country = country,
         )
-
-    companion object {
-
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val repo = MockWeatherRepository()
-                val useCase = GetAllLocationsUseCase(repo)
-                return SearchViewModel(useCase) as T
-            }
-        }
-    }
 }
-
-
