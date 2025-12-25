@@ -1,6 +1,7 @@
 package com.example.bold_weather_api.ui.search
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -14,30 +15,24 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bold_weather_api.ui.search.components.LocationRow
-import com.example.bold_weather_api.ui.search.components.LocationRowUi
 import com.example.bold_weather_api.ui.theme.BoldweatherapiTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
+    state: SearchUiState,
+    onQueryChanged: (String) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val items = remember {
-        listOf(
-            LocationRowUi(name = "Medellín", country = "Colombia"),
-            LocationRowUi(name = "Bogotá", country = "Colombia"),
-            LocationRowUi(name = "Paris", country = "France"),
-        )
-    }
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -58,8 +53,8 @@ fun SearchScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = state.query,
+                onValueChange = onQueryChanged,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Type a location") },
                 singleLine = true,
@@ -67,25 +62,58 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Results",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(bottom = 24.dp),
-            ) {
-                items(items) { row ->
-                    LocationRow(
-                        row = row,
-                        onClick = {
-                            /* navigate to detail screen */
-                        },
+            when (state) {
+                is SearchUiState.Loading -> {
+                    Text(
+                        text = "Loading…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                }
+
+                is SearchUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column {
+                            Text(
+                                text = "Something went wrong",
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = state.message,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            TextButton(onClick = onRetry) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
+
+                is SearchUiState.Success -> {
+                    Text(
+                        text = "Results",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(bottom = 24.dp),
+                    ) {
+                        items(state.locations) { row ->
+                            LocationRow(
+                                row = row,
+                                onClick = {
+                                    /* navigate to detail screen */
+                                },
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -96,8 +124,13 @@ fun SearchScreen(
 @Composable
 private fun SearchScreenPreview() {
     BoldweatherapiTheme {
-        SearchScreen()
+        SearchScreen(
+            state = SearchUiState.Success(
+                query = "",
+                locations = emptyList(),
+            ),
+            onQueryChanged = {},
+            onRetry = {},
+        )
     }
 }
-
-
