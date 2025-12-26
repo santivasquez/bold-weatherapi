@@ -167,6 +167,7 @@ private fun SearchBody(
                 items(state.locations) { row ->
                     LocationRow(
                         row = row,
+                        enabled = row.lat != null && row.lon != null,
                         onClick = { onLocationSelected(row) },
                     )
                 }

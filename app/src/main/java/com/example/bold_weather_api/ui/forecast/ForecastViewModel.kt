@@ -23,10 +23,10 @@ class ForecastViewModel @Inject constructor(
     val uiState: StateFlow<ForecastUiState> = _uiState
 
     private val lat: Double?
-        get() = savedStateHandle.get<String>(Routes.ARG_LAT)?.toDoubleOrNull()
+        get() = savedStateHandle.get<Float>(Routes.ARG_LAT)?.toDouble()
 
     private val lon: Double?
-        get() = savedStateHandle.get<String>(Routes.ARG_LON)?.toDoubleOrNull()
+        get() = savedStateHandle.get<Float>(Routes.ARG_LON)?.toDouble()
 
     init {
         load()

@@ -46,8 +46,8 @@ fun AppNavHost(
         composable(
             route = Routes.FORECAST,
             arguments = listOf(
-                navArgument(Routes.ARG_LAT) { type = NavType.StringType },
-                navArgument(Routes.ARG_LON) { type = NavType.StringType },
+                navArgument(Routes.ARG_LAT) { type = NavType.FloatType },
+                navArgument(Routes.ARG_LON) { type = NavType.FloatType },
             ),
         ) {
             ForecastRoute(
