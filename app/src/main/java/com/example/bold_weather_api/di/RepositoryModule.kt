@@ -1,6 +1,6 @@
 package com.example.bold_weather_api.di
 
-import com.example.bold_weather_api.data.repository.MockWeatherRepository
+import com.example.bold_weather_api.data.repository.WeatherRepositoryImpl
 import com.example.bold_weather_api.domain.repository.WeatherRepository
 import dagger.Module
 import dagger.Provides
@@ -14,7 +14,5 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideWeatherRepository(): WeatherRepository = MockWeatherRepository()
+    fun provideWeatherRepository(impl: WeatherRepositoryImpl): WeatherRepository = impl
 }
-
-

@@ -5,7 +5,7 @@ import com.example.bold_weather_api.domain.repository.WeatherRepository
 import kotlinx.coroutines.delay
 
 class MockWeatherRepository : WeatherRepository {
-    override suspend fun getAllLocations(): List<Location> {
+    override suspend fun searchLocations(query: String): List<Location> {
         delay(1500)
         return listOf(
             Location(id = 1, name = "Medellín", country = "Colombia", lat = 6.2442, lon = -75.5812),

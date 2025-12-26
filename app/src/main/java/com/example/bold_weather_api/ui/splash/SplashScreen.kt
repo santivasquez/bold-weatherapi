@@ -78,5 +78,3 @@ private fun SplashScreenPreview() {
         SplashScreen()
     }
 }
-
-

@@ -16,23 +16,21 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Splash,
+        startDestination = Routes.SPLASH,
         modifier = modifier,
     ) {
-        composable(Routes.Splash) {
+        composable(Routes.SPLASH) {
             SplashRoute(
                 onFinished = {
-                    navController.navigate(Routes.Search) {
-                        popUpTo(Routes.Splash) { inclusive = true }
+                    navController.navigate(Routes.SEARCH) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
             )
         }
-        composable(Routes.Search) {
+        composable(Routes.SEARCH) {
             SearchRoute()
         }
     }
 }
-
-

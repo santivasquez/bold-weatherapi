@@ -4,8 +4,9 @@ import com.example.bold_weather_api.domain.model.Location
 import com.example.bold_weather_api.domain.repository.WeatherRepository
 import javax.inject.Inject
 
-class GetAllLocationsUseCase @Inject constructor(
+class SearchLocationsUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository,
 ) {
-    suspend operator fun invoke(): List<Location> = weatherRepository.getAllLocations()
+    suspend operator fun invoke(query: String): List<Location> =
+        weatherRepository.searchLocations(query)
 }
