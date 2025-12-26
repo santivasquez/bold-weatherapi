@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +36,8 @@ fun SearchScreen(
     onQueryChanged: (String) -> Unit,
     onRetry: () -> Unit,
     onLocationSelected: (com.example.bold_weather_api.ui.search.components.LocationRowUi) -> Unit,
+    onUseMyLocation: () -> Unit,
+    locationErrorMessage: String? = null,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -58,6 +61,8 @@ fun SearchScreen(
                     SearchHeader(
                         query = state.query,
                         onQueryChanged = onQueryChanged,
+                        onUseMyLocation = onUseMyLocation,
+                        locationErrorMessage = locationErrorMessage,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     SearchBody(
@@ -76,6 +81,8 @@ fun SearchScreen(
                         SearchHeader(
                             query = state.query,
                             onQueryChanged = onQueryChanged,
+                            onUseMyLocation = onUseMyLocation,
+                            locationErrorMessage = locationErrorMessage,
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
@@ -100,6 +107,8 @@ fun SearchScreen(
 private fun SearchHeader(
     query: String,
     onQueryChanged: (String) -> Unit,
+    onUseMyLocation: () -> Unit,
+    locationErrorMessage: String?,
 ) {
     Text(
         text = "Find a location",
@@ -113,6 +122,21 @@ private fun SearchHeader(
         placeholder = { Text("Type a location") },
         singleLine = true,
     )
+    Spacer(modifier = Modifier.height(10.dp))
+    Button(
+        onClick = onUseMyLocation,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text("Use my location")
+    }
+    if (!locationErrorMessage.isNullOrBlank()) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = locationErrorMessage,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+        )
+    }
 }
 
 @Composable
@@ -188,6 +212,8 @@ private fun SearchScreenPreview() {
             onQueryChanged = {},
             onRetry = {},
             onLocationSelected = {},
+            onUseMyLocation = {},
+            locationErrorMessage = "Location permission denied.",
         )
     }
 }

@@ -40,7 +40,10 @@ fun AppNavHost(
                     if (lat != null && lon != null) {
                         navController.navigate(Routes.forecast(lat, lon))
                     }
-                }
+                },
+                onNavigateToForecast = { lat, lon ->
+                    navController.navigate(Routes.forecast(lat, lon))
+                },
             )
         }
         composable(
