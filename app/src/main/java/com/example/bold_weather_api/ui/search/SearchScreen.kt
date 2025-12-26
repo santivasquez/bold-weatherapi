@@ -1,14 +1,17 @@
 package com.example.bold_weather_api.ui.search
 
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +34,7 @@ fun SearchScreen(
     state: SearchUiState,
     onQueryChanged: (String) -> Unit,
     onRetry: () -> Unit,
+    onLocationSelected: (com.example.bold_weather_api.ui.search.components.LocationRowUi) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -41,79 +45,130 @@ fun SearchScreen(
             )
         },
     ) { padding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
                 .fillMaxSize(),
         ) {
+            val isWide = maxWidth >= 600.dp
+
+            if (!isWide) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    SearchHeader(
+                        query = state.query,
+                        onQueryChanged = onQueryChanged,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    SearchBody(
+                        state = state,
+                        onRetry = onRetry,
+                        onLocationSelected = onLocationSelected,
+                    )
+                }
+            } else {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize(),
+                    ) {
+                        SearchHeader(
+                            query = state.query,
+                            onQueryChanged = onQueryChanged,
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize(),
+                    ) {
+                        SearchBody(
+                            state = state,
+                            onRetry = onRetry,
+                            onLocationSelected = onLocationSelected,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchHeader(
+    query: String,
+    onQueryChanged: (String) -> Unit,
+) {
+    Text(
+        text = "Find a location",
+        style = MaterialTheme.typography.titleMedium,
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChanged,
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("Type a location") },
+        singleLine = true,
+    )
+}
+
+@Composable
+private fun SearchBody(
+    state: SearchUiState,
+    onRetry: () -> Unit,
+    onLocationSelected: (com.example.bold_weather_api.ui.search.components.LocationRowUi) -> Unit,
+) {
+    when (state) {
+        is SearchUiState.Loading -> {
             Text(
-                text = "Find a location",
-                style = MaterialTheme.typography.titleMedium,
+                text = "Loading…",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = state.query,
-                onValueChange = onQueryChanged,
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Type a location") },
-                singleLine = true,
-            )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            when (state) {
-                is SearchUiState.Loading -> {
+        is SearchUiState.Error -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column {
                     Text(
-                        text = "Loading…",
+                        text = "Something went wrong",
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = state.message,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                }
-
-                is SearchUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Column {
-                            Text(
-                                text = "Something went wrong",
-                                style = MaterialTheme.typography.titleSmall,
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = state.message,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            TextButton(onClick = onRetry) {
-                                Text("Retry")
-                            }
-                        }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    TextButton(onClick = onRetry) {
+                        Text("Retry")
                     }
                 }
+            }
+        }
 
-                is SearchUiState.Success -> {
-                    Text(
-                        text = "Results",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        is SearchUiState.Success -> {
+            Text(
+                text = "Results",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(bottom = 24.dp),
+            ) {
+                items(state.locations) { row ->
+                    LocationRow(
+                        row = row,
+                        onClick = { onLocationSelected(row) },
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(bottom = 24.dp),
-                    ) {
-                        items(state.locations) { row ->
-                            LocationRow(
-                                row = row,
-                                onClick = {
-                                    /* navigate to detail screen */
-                                },
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -131,6 +186,7 @@ private fun SearchScreenPreview() {
             ),
             onQueryChanged = {},
             onRetry = {},
+            onLocationSelected = {},
         )
     }
 }

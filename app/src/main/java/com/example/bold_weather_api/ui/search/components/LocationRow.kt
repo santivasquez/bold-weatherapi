@@ -21,6 +21,8 @@ import com.example.bold_weather_api.ui.theme.BoldweatherapiTheme
 data class LocationRowUi(
     val name: String,
     val country: String,
+    val lat: Double?,
+    val lon: Double?,
 )
 
 @Composable
@@ -55,7 +57,7 @@ fun LocationRow(
 private fun LocationRowPreview() {
     BoldweatherapiTheme {
         LocationRow(
-            row = LocationRowUi(name = "Bogotá", country = "Colombia"),
+            row = LocationRowUi(name = "Bogotá", country = "Colombia", lat = 4.7110, lon = -74.0721),
             onClick = {},
             modifier = Modifier.padding(16.dp),
         )

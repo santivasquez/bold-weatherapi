@@ -7,4 +7,6 @@ fun Location.toRowUi(): LocationRowUi =
     LocationRowUi(
         name = name,
         country = country,
+        lat = lat,
+        lon = lon,
     )
