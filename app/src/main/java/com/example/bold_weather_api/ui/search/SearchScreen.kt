@@ -23,13 +23,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bold_weather_api.R
+import com.example.bold_weather_api.ui.common.InfoDialog
+import com.example.bold_weather_api.ui.common.LoadingOverlay
 import com.example.bold_weather_api.ui.common.UiText
-import com.example.bold_weather_api.ui.common.asString
 import com.example.bold_weather_api.ui.search.components.LocationRow
 import com.example.bold_weather_api.ui.theme.BoldweatherapiTheme
 
@@ -41,9 +45,14 @@ fun SearchScreen(
     onRetry: () -> Unit,
     onLocationSelected: (com.example.bold_weather_api.ui.search.components.LocationRowUi) -> Unit,
     onUseMyLocation: () -> Unit,
-    locationErrorMessage: UiText? = null,
     modifier: Modifier = Modifier,
 ) {
+    val showApiErrorDialog = remember { mutableStateOf(false) }
+
+    LaunchedEffect(state) {
+        showApiErrorDialog.value = state is SearchUiState.Error
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -60,50 +69,66 @@ fun SearchScreen(
         ) {
             val isWide = maxWidth >= 600.dp
 
-            if (!isWide) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    SearchHeader(
-                        query = state.query,
-                        onQueryChanged = onQueryChanged,
-                        onUseMyLocation = onUseMyLocation,
-                        locationErrorMessage = locationErrorMessage,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    SearchBody(
-                        state = state,
-                        onRetry = onRetry,
-                        onLocationSelected = onLocationSelected,
-                    )
-                }
-            } else {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize(),
-                    ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (!isWide) {
+                    Column(modifier = Modifier.fillMaxSize()) {
                         SearchHeader(
                             query = state.query,
                             onQueryChanged = onQueryChanged,
                             onUseMyLocation = onUseMyLocation,
-                            locationErrorMessage = locationErrorMessage,
                         )
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize(),
-                    ) {
+                        Spacer(modifier = Modifier.height(16.dp))
                         SearchBody(
                             state = state,
-                            onRetry = onRetry,
                             onLocationSelected = onLocationSelected,
                         )
                     }
+                } else {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxSize(),
+                        ) {
+                            SearchHeader(
+                                query = state.query,
+                                onQueryChanged = onQueryChanged,
+                                onUseMyLocation = onUseMyLocation,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxSize(),
+                        ) {
+                            SearchBody(
+                                state = state,
+                                onLocationSelected = onLocationSelected,
+                            )
+                        }
+                    }
+                }
+
+                if (state is SearchUiState.Loading) {
+                    LoadingOverlay()
                 }
             }
         }
+    }
+
+    // API errors (search)
+    val apiErrorMessage = (state as? SearchUiState.Error)?.message
+    if (apiErrorMessage != null && showApiErrorDialog.value) {
+        InfoDialog(
+            title = UiText.StringRes(R.string.common_something_went_wrong),
+            message = apiErrorMessage,
+            onDismiss = { showApiErrorDialog.value = false },
+            onRetry = {
+                showApiErrorDialog.value = false
+                onRetry()
+            }
+        )
     }
 }
 
@@ -112,7 +137,6 @@ private fun SearchHeader(
     query: String,
     onQueryChanged: (String) -> Unit,
     onUseMyLocation: () -> Unit,
-    locationErrorMessage: UiText?,
 ) {
     Text(
         text = stringResource(R.string.search_find_location),
@@ -133,50 +157,20 @@ private fun SearchHeader(
     ) {
         Text(stringResource(R.string.search_use_my_location))
     }
-    if (locationErrorMessage != null) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = locationErrorMessage.asString(),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.error,
-        )
-    }
 }
 
 @Composable
 private fun SearchBody(
     state: SearchUiState,
-    onRetry: () -> Unit,
     onLocationSelected: (com.example.bold_weather_api.ui.search.components.LocationRowUi) -> Unit,
 ) {
     when (state) {
         is SearchUiState.Loading -> {
-            Text(
-                text = stringResource(R.string.common_loading),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            // Keep content visible; loading overlay is handled by parent.
         }
 
         is SearchUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.common_something_went_wrong),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = state.message.asString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    TextButton(onClick = onRetry) {
-                        Text(stringResource(R.string.common_retry))
-                    }
-                }
-            }
+            // Dialog is handled by parent.
         }
 
         is SearchUiState.Success -> {
@@ -217,7 +211,6 @@ private fun SearchScreenPreview() {
             onRetry = {},
             onLocationSelected = {},
             onUseMyLocation = {},
-            locationErrorMessage = UiText.StringRes(R.string.search_location_permission_denied),
         )
     }
 }

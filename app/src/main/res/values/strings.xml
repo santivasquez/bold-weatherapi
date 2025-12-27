@@ -9,6 +9,8 @@
     <!-- Common -->
     <string name="common_loading">Loading…</string>
     <string name="common_retry">Retry</string>
+    <string name="common_ok">OK</string>
+    <string name="common_close">Close</string>
     <string name="common_something_went_wrong">Something went wrong</string>
 
     <!-- Search -->

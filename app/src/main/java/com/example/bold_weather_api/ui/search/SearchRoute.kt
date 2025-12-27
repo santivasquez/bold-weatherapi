@@ -2,7 +2,9 @@ package com.example.bold_weather_api.ui.search
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.example.bold_weather_api.R
 import com.example.bold_weather_api.ui.common.UiText
+import com.example.bold_weather_api.ui.common.asString
 
 @Composable
 fun SearchRoute(
@@ -30,6 +33,13 @@ fun SearchRoute(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val locationError = remember { mutableStateOf<UiText?>(null) }
+
+    // Show location-related errors as Toast and clear them.
+    LaunchedEffect(locationError.value) {
+        val err = locationError.value ?: return@LaunchedEffect
+        Toast.makeText(context, err.asString(context), Toast.LENGTH_LONG).show()
+        locationError.value = null
+    }
 
     fun hasLocationPermission(): Boolean {
         val fine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -82,6 +92,5 @@ fun SearchRoute(
                 )
             }
         },
-        locationErrorMessage = locationError.value,
     )
 }

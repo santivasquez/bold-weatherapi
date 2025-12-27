@@ -1,6 +1,7 @@
 package com.example.bold_weather_api.ui.forecast
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +42,9 @@ import com.example.bold_weather_api.R
 import com.example.bold_weather_api.domain.model.Forecast
 import com.example.bold_weather_api.domain.model.ForecastDay
 import com.example.bold_weather_api.ui.common.asString
+import com.example.bold_weather_api.ui.common.InfoDialog
+import com.example.bold_weather_api.ui.common.LoadingOverlay
+import com.example.bold_weather_api.ui.common.UiText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +54,11 @@ fun ForecastScreen(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val showErrorDialog = remember { mutableStateOf(false) }
+    LaunchedEffect(state) {
+        showErrorDialog.value = state is ForecastUiState.Error
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -72,38 +84,40 @@ fun ForecastScreen(
         ) {
             val isWide = maxWidth >= 600.dp
 
-            when (state) {
-                ForecastUiState.Loading -> {
-                    Text(
-                        text = stringResource(R.string.common_loading),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                is ForecastUiState.Error -> {
-                    Text(
-                        text = stringResource(R.string.common_something_went_wrong),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = state.message.asString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    TextButton(onClick = onRetry) { Text(stringResource(R.string.common_retry)) }
-                }
-
-                is ForecastUiState.Success -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (state is ForecastUiState.Success) {
                     ForecastContent(
                         forecast = state.forecast,
                         isWide = isWide,
                     )
                 }
+                if (state is ForecastUiState.Error) {
+                    // Fallback UI so the screen is never "blank" after dismissing the dialog.
+                    TextButton(
+                        onClick = onRetry,
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.Center),
+                    ) {
+                        Text(stringResource(R.string.common_retry))
+                    }
+                }
+                if (state is ForecastUiState.Loading) {
+                    LoadingOverlay()
+                }
             }
         }
+    }
+
+    val errorMessage = (state as? ForecastUiState.Error)?.message
+    if (errorMessage != null && showErrorDialog.value) {
+        InfoDialog(
+            title = UiText.StringRes(R.string.common_something_went_wrong),
+            message = errorMessage,
+            onDismiss = { showErrorDialog.value = false },
+            onRetry = {
+                showErrorDialog.value = false
+                onRetry()
+            },
+        )
     }
 }
 
