@@ -1,3 +1,43 @@
 <resources>
-    <string name="app_name">bold-weather-api</string>
+    <string name="app_name">Bold Weather API</string>
+
+    <!-- Splash -->
+    <string name="splash_logo_cd">App logo</string>
+    <string name="splash_title">Bold Weather API</string>
+    <string name="splash_subtitle">Consult &amp; Explore Global Weather</string>
+
+    <!-- Common -->
+    <string name="common_loading">Loading…</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_something_went_wrong">Something went wrong</string>
+
+    <!-- Search -->
+    <string name="search_title">Search</string>
+    <string name="search_find_location">Find a location</string>
+    <string name="search_placeholder">Type a location</string>
+    <string name="search_use_my_location">Use my location</string>
+    <string name="search_results">Results</string>
+    <string name="search_location_permission_denied">Location permission denied.</string>
+    <string name="search_location_unavailable">Could not get current location. Try again.</string>
+    <string name="search_location_error_generic">Could not get current location.</string>
+
+    <!-- Forecast -->
+    <string name="forecast_title">Forecast</string>
+    <string name="forecast_back_cd">Back</string>
+    <string name="forecast_current_label">Current</string>
+    <string name="forecast_next_days_label">Next days</string>
+    <string name="forecast_location_header_format">%1$s, %2$s</string>
+    <string name="forecast_temp_c_format">%1$.1f °C</string>
+    <string name="forecast_avg_temp_c_format">Avg: %1$.1f °C</string>
+    <string name="forecast_invalid_coordinates">Invalid location coordinates.</string>
+
+    <!-- Errors -->
+    <string name="error_network">Network error. Check your connection.</string>
+    <string name="error_timeout">Request timed out. Please try again.</string>
+    <string name="error_unauthorized_401">Unauthorized (401). Check WEATHER_API_KEY in local.properties.</string>
+    <string name="error_forbidden_403">Forbidden (403). Check if the API key has permissions.</string>
+    <string name="error_rate_limit_429">Rate limit (429). Please wait and try again.</string>
+    <string name="error_serialization">Unexpected response format.</string>
+    <string name="error_http_generic_with_code">Request failed (%1$d). Please try again.</string>
+    <string name="error_unknown">Unexpected error</string>
 </resources>

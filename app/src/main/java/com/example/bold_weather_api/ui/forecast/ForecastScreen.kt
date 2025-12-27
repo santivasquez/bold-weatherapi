@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -36,6 +37,7 @@ import coil.request.ImageRequest
 import com.example.bold_weather_api.R
 import com.example.bold_weather_api.domain.model.Forecast
 import com.example.bold_weather_api.domain.model.ForecastDay
+import com.example.bold_weather_api.ui.common.asString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,12 +51,12 @@ fun ForecastScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Forecast") },
+                title = { Text(stringResource(R.string.forecast_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.forecast_back_cd),
                         )
                     }
                 },
@@ -73,7 +75,7 @@ fun ForecastScreen(
             when (state) {
                 ForecastUiState.Loading -> {
                     Text(
-                        text = "Loading…",
+                        text = stringResource(R.string.common_loading),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -81,17 +83,17 @@ fun ForecastScreen(
 
                 is ForecastUiState.Error -> {
                     Text(
-                        text = "Something went wrong",
+                        text = stringResource(R.string.common_something_went_wrong),
                         style = MaterialTheme.typography.titleSmall,
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = state.message,
+                        text = state.message.asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    TextButton(onClick = onRetry) { Text("Retry") }
+                    TextButton(onClick = onRetry) { Text(stringResource(R.string.common_retry)) }
                 }
 
                 is ForecastUiState.Success -> {
@@ -117,7 +119,7 @@ private fun ForecastContent(
             CurrentCard(forecast = forecast)
             Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = "Next days",
+                text = stringResource(R.string.forecast_next_days_label),
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -144,7 +146,7 @@ private fun ForecastContent(
                     .fillMaxSize(),
             ) {
                 Text(
-                    text = "Next days",
+                    text = stringResource(R.string.forecast_next_days_label),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -162,7 +164,11 @@ private fun ForecastHeader(
     forecast: Forecast,
 ) {
     Text(
-        text = "${forecast.locationName}, ${forecast.country}",
+        text = stringResource(
+            R.string.forecast_location_header_format,
+            forecast.locationName,
+            forecast.country,
+        ),
         style = MaterialTheme.typography.titleLarge,
     )
 }
@@ -175,12 +181,12 @@ private fun CurrentCard(
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text = "Current",
+                text = stringResource(R.string.forecast_current_label),
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "${forecast.currentTempC} °C",
+                text = stringResource(R.string.forecast_temp_c_format, forecast.currentTempC),
                 style = MaterialTheme.typography.headlineSmall,
             )
             Spacer(modifier = Modifier.height(2.dp))
@@ -223,7 +229,7 @@ private fun ForecastDayRow(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Avg: ${day.avgTempC} °C",
+                text = stringResource(R.string.forecast_avg_temp_c_format, day.avgTempC),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(2.dp))

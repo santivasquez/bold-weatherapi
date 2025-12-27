@@ -24,8 +24,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.bold_weather_api.R
+import com.example.bold_weather_api.ui.common.UiText
+import com.example.bold_weather_api.ui.common.asString
 import com.example.bold_weather_api.ui.search.components.LocationRow
 import com.example.bold_weather_api.ui.theme.BoldweatherapiTheme
 
@@ -37,14 +41,14 @@ fun SearchScreen(
     onRetry: () -> Unit,
     onLocationSelected: (com.example.bold_weather_api.ui.search.components.LocationRowUi) -> Unit,
     onUseMyLocation: () -> Unit,
-    locationErrorMessage: String? = null,
+    locationErrorMessage: UiText? = null,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Search") },
+                title = { Text(text = stringResource(R.string.search_title)) },
             )
         },
     ) { padding ->
@@ -108,10 +112,10 @@ private fun SearchHeader(
     query: String,
     onQueryChanged: (String) -> Unit,
     onUseMyLocation: () -> Unit,
-    locationErrorMessage: String?,
+    locationErrorMessage: UiText?,
 ) {
     Text(
-        text = "Find a location",
+        text = stringResource(R.string.search_find_location),
         style = MaterialTheme.typography.titleMedium,
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -119,7 +123,7 @@ private fun SearchHeader(
         value = query,
         onValueChange = onQueryChanged,
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Type a location") },
+        placeholder = { Text(stringResource(R.string.search_placeholder)) },
         singleLine = true,
     )
     Spacer(modifier = Modifier.height(10.dp))
@@ -127,12 +131,12 @@ private fun SearchHeader(
         onClick = onUseMyLocation,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("Use my location")
+        Text(stringResource(R.string.search_use_my_location))
     }
-    if (!locationErrorMessage.isNullOrBlank()) {
+    if (locationErrorMessage != null) {
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = locationErrorMessage,
+            text = locationErrorMessage.asString(),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.error,
         )
@@ -148,7 +152,7 @@ private fun SearchBody(
     when (state) {
         is SearchUiState.Loading -> {
             Text(
-                text = "Loading…",
+                text = stringResource(R.string.common_loading),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -158,18 +162,18 @@ private fun SearchBody(
             Box(modifier = Modifier.fillMaxSize()) {
                 Column {
                     Text(
-                        text = "Something went wrong",
+                        text = stringResource(R.string.common_something_went_wrong),
                         style = MaterialTheme.typography.titleSmall,
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = state.message,
+                        text = state.message.asString(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     TextButton(onClick = onRetry) {
-                        Text("Retry")
+                        Text(stringResource(R.string.common_retry))
                     }
                 }
             }
@@ -177,7 +181,7 @@ private fun SearchBody(
 
         is SearchUiState.Success -> {
             Text(
-                text = "Results",
+                text = stringResource(R.string.search_results),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -213,7 +217,7 @@ private fun SearchScreenPreview() {
             onRetry = {},
             onLocationSelected = {},
             onUseMyLocation = {},
-            locationErrorMessage = "Location permission denied.",
+            locationErrorMessage = UiText.StringRes(R.string.search_location_permission_denied),
         )
     }
 }

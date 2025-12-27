@@ -16,6 +16,8 @@ import com.example.bold_weather_api.ui.search.components.LocationRowUi
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.example.bold_weather_api.R
+import com.example.bold_weather_api.ui.common.UiText
 
 @Composable
 fun SearchRoute(
@@ -27,7 +29,7 @@ fun SearchRoute(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val locationError = remember { mutableStateOf<String?>(null) }
+    val locationError = remember { mutableStateOf<UiText?>(null) }
 
     fun hasLocationPermission(): Boolean {
         val fine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -40,13 +42,14 @@ fun SearchRoute(
             val client = LocationServices.getFusedLocationProviderClient(context)
             val location = client.lastLocation.await()
             if (location == null) {
-                locationError.value = "Couldn't get current location. Try again."
+                locationError.value = UiText.StringRes(R.string.search_location_unavailable)
                 return
             }
             locationError.value = null
             onNavigateToForecast(location.latitude, location.longitude)
         } catch (t: Throwable) {
-            locationError.value = t.message ?: "Couldn't get current location."
+            locationError.value =
+                t.message?.let { UiText.Dynamic(it) } ?: UiText.StringRes(R.string.search_location_error_generic)
         }
     }
 
@@ -57,7 +60,7 @@ fun SearchRoute(
         if (granted) {
             scope.launch { fetchAndNavigateToCurrentLocation() }
         } else {
-            locationError.value = "Location permission denied."
+            locationError.value = UiText.StringRes(R.string.search_location_permission_denied)
         }
     }
 

@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,21 +52,34 @@ fun SplashScreen(
         ) {
             Image(
                 painter = painterResource( R.drawable.app_logo),
-                contentDescription = "App logo",
+                contentDescription = stringResource(R.string.splash_logo_cd),
                 modifier = Modifier.size(120.dp),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Bold Weather API",
+                text = stringResource(R.string.splash_title),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Consult & Explore Global Weather",
+                text = stringResource(R.string.splash_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.9f),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(18.dp))
+            Text(
+                text = "by",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.9f),
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = "Santiago Vasquez",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White,
                 textAlign = TextAlign.Center,
             )
         }

@@ -7,6 +7,8 @@ import com.example.bold_weather_api.core.error.AppError
 import com.example.bold_weather_api.core.error.AppException
 import com.example.bold_weather_api.domain.usecase.GetForecastUseCase
 import com.example.bold_weather_api.navigation.Routes
+import com.example.bold_weather_api.ui.common.UiText
+import com.example.bold_weather_api.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +42,7 @@ class ForecastViewModel @Inject constructor(
         val safeLat = lat
         val safeLon = lon
         if (safeLat == null || safeLon == null) {
-            _uiState.value = ForecastUiState.Error("Invalid location coordinates.")
+            _uiState.value = ForecastUiState.Error(UiText.StringRes(R.string.forecast_invalid_coordinates))
             return
         }
 
@@ -51,20 +53,22 @@ class ForecastViewModel @Inject constructor(
                 _uiState.value = ForecastUiState.Success(forecast)
             } catch (t: Throwable) {
                 val appError = (t as? AppException)?.error ?: AppError.Unknown(t.message)
-                val message = when (appError) {
-                    AppError.Network -> "Network error. Check your connection."
-                    AppError.Timeout -> "Request timed out. Please try again."
-                    is AppError.Http -> when (appError.code) {
-                        401 -> "Unauthorized (401). Check WEATHER_API_KEY in local.properties."
-                        403 -> "Forbidden (403). Check if the API key has permissions."
-                        429 -> "Rate limit (429). Please wait and try again."
-                        else -> "Request failed (${appError.code}). Please try again."
-                    }
-                    AppError.Serialization -> "Unexpected response format."
-                    is AppError.Unknown -> appError.message ?: "Unexpected error"
-                }
-                _uiState.value = ForecastUiState.Error(message)
+                _uiState.value = ForecastUiState.Error(appError.toUiText())
             }
         }
     }
+
+    private fun AppError.toUiText(): UiText =
+        when (this) {
+            AppError.Network -> UiText.StringRes(R.string.error_network)
+            AppError.Timeout -> UiText.StringRes(R.string.error_timeout)
+            is AppError.Http -> when (code) {
+                401 -> UiText.StringRes(R.string.error_unauthorized_401)
+                403 -> UiText.StringRes(R.string.error_forbidden_403)
+                429 -> UiText.StringRes(R.string.error_rate_limit_429)
+                else -> UiText.StringRes(R.string.error_http_generic_with_code, args = listOf(code))
+            }
+            AppError.Serialization -> UiText.StringRes(R.string.error_serialization)
+            is AppError.Unknown -> message?.let { UiText.Dynamic(it) } ?: UiText.StringRes(R.string.error_unknown)
+        }
 }

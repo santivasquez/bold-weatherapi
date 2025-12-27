@@ -6,6 +6,8 @@ import com.example.bold_weather_api.core.error.AppError
 import com.example.bold_weather_api.core.error.AppException
 import com.example.bold_weather_api.domain.usecase.SearchLocationsUseCase
 import com.example.bold_weather_api.ui.search.mapper.toRowUi
+import com.example.bold_weather_api.ui.common.UiText
+import com.example.bold_weather_api.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,20 +77,22 @@ class SearchViewModel @Inject constructor(
                 )
             } catch (throwable: Throwable) {
                 val appError = (throwable as? AppException)?.error ?: AppError.Unknown(throwable.message)
-                val message = when (appError) {
-                    AppError.Network -> "Network error. Check your connection."
-                    AppError.Timeout -> "Request timed out. Please try again."
-                    is AppError.Http -> when (appError.code) {
-                        401 -> "Unauthorized (401). Check WEATHER_API_KEY in local.properties."
-                        403 -> "Forbidden (403). Check if the API key has permissions."
-                        429 -> "Rate limit (429). Please wait and try again."
-                        else -> "Request failed (${appError.code}). Please try again."
-                    }
-                    AppError.Serialization -> "Unexpected response format."
-                    is AppError.Unknown -> appError.message ?: "Unexpected error"
-                }
-                _uiState.value = SearchUiState.Error(query = query, message = message)
+                _uiState.value = SearchUiState.Error(query = query, message = appError.toUiText())
             }
         }
     }
+
+    private fun AppError.toUiText(): UiText =
+        when (this) {
+            AppError.Network -> UiText.StringRes(R.string.error_network)
+            AppError.Timeout -> UiText.StringRes(R.string.error_timeout)
+            is AppError.Http -> when (code) {
+                401 -> UiText.StringRes(R.string.error_unauthorized_401)
+                403 -> UiText.StringRes(R.string.error_forbidden_403)
+                429 -> UiText.StringRes(R.string.error_rate_limit_429)
+                else -> UiText.StringRes(R.string.error_http_generic_with_code, args = listOf(code))
+            }
+            AppError.Serialization -> UiText.StringRes(R.string.error_serialization)
+            is AppError.Unknown -> message?.let { UiText.Dynamic(it) } ?: UiText.StringRes(R.string.error_unknown)
+        }
 }

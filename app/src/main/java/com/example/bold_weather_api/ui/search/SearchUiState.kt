@@ -1,6 +1,7 @@
 package com.example.bold_weather_api.ui.search
 
 import com.example.bold_weather_api.ui.search.components.LocationRowUi
+import com.example.bold_weather_api.ui.common.UiText
 
 sealed interface SearchUiState {
     val query: String
@@ -16,6 +17,6 @@ sealed interface SearchUiState {
 
     data class Error(
         override val query: String = "",
-        val message: String,
+        val message: UiText,
     ) : SearchUiState
 }
