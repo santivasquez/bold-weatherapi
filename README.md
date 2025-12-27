@@ -14,7 +14,7 @@ Android app (Kotlin + Jetpack Compose) that lets you search locations and view c
 
 ## Tech stack
 - **UI**: Jetpack Compose (Material 3)
-- **Architecture**: Clean-ish layering inside `:app` (domain/data/presentation packages) + MVVM
+- **Architecture**: Multi-module Clean Architecture + MVVM
 - **DI**: Hilt
 - **Networking**: Retrofit + OkHttp + Moshi
 - **Images**: Coil
@@ -34,7 +34,7 @@ Add your WeatherAPI key to `local.properties` (root):
 WEATHER_API_KEY=de5553176da64306b86153651221606
 ```
 
-The app reads it at build time and injects it into `BuildConfig.WEATHER_API_KEY`.
+The app reads it at build time and injects it into `data.BuildConfig.WEATHER_API_KEY` (the `:data` module).
 
 ### 3) Build & run
 From repo root:
@@ -50,17 +50,20 @@ Run on device/emulator from Android Studio or install the generated APK.
 Run unit tests:
 
 ```bash
-./gradlew :app:testDebugUnitTest
+./gradlew :data:testDebugUnitTest
+./gradlew :presentation:testDebugUnitTest
 ```
 
 ## Project structure (current)
-We’re still in a single Gradle module (`:app`) to keep iteration fast. Inside it we keep package boundaries:
-- `domain/`: business models + repository interfaces + use cases
-- `data/`: Retrofit DTOs, mappers, repository implementations
-- `ui/`: Compose screens + ViewModels (MVVM)
-- `di/`: Hilt modules
+This project uses a multi-module setup:
+
+- `:app` (Android application): entrypoint only (`MainActivity`, `Application`, manifest).
+- `:presentation` (Android library): Compose UI, navigation, ViewModels, UI helpers, and its own resources (`presentation.R`).
+- `:data` (Android library): Retrofit/OkHttp/Moshi, DTOs + mappers, repository implementations, Hilt modules, and `data.BuildConfig.WEATHER_API_KEY`.
+- `:domain` (pure Kotlin): models, repository interfaces, and use cases.
+- `:core` (Android library): error types and `safeApiCall` error mapping.
 
 ## Notes
-- Location search uses debounce + cancellation (`flatMapLatest`) to avoid multiple in-flight calls.
+- Location search uses debounce to avoid excessive API calls.
 - Forecast uses `q=lat,lon` to avoid ambiguity in city names.
 
