@@ -5,6 +5,8 @@
     <string name="splash_logo_cd">Logo de la app</string>
     <string name="splash_title">Bold Weather API</string>
     <string name="splash_subtitle">Consulta y explora el clima global</string>
+    <string name="splash_by">por</string>
+    <string name="splash_author">Santiago Vasquez</string>
 
     <!-- Common -->
     <string name="common_loading">Cargando…</string>

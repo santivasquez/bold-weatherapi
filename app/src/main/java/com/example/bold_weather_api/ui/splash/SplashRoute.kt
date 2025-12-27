@@ -9,7 +9,7 @@ fun SplashRoute(
     onFinished: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        delay(1200)
+        delay(1800)
         onFinished()
     }
 
